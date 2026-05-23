@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>守塔猫 · 猫属MBTI测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5efe6;
+            font-family: -apple-system, "Noto Serif SC", "Times New Roman", serif;
+            padding: 20px 16px 48px;
+            color: #2c2418;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fffef7;
+            border-radius: 32px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            overflow: hidden;
+            padding: 24px 20px 32px;
+            border: 1px solid #e9dfd1;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+            color: #5e4b3c;
+        }
+        .sub {
+            text-align: center;
+            font-size: 13px;
+            color: #b6a28a;
+            border-bottom: 1px dashed #e6d9cc;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        .question-card {
+            background: #fefaf5;
+            border-radius: 24px;
+            padding: 18px 16px;
+            margin-bottom: 18px;
+            border: 1px solid #f0e4d6;
+            transition: all 0.2s ease;
+        }
+        .q-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 14px;
+            color: #7c5f48;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .q-num {
+            background: #e7d9cc;
+            border-radius: 30px;
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #5e3e2a;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option {
+            background: white;
+            border-radius: 40px;
+            padding: 10px 16px;
+            border: 1px solid #ede3d6;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .option.selected {
+            background: #f9efd9;
+            border-color: #c9ab8b;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .option-letter {
+            font-weight: bold;
+            width: 28px;
+            height: 28px;
+            background: #f0e2d2;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #7a5a3e;
+        }
+        .option-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #3f3324;
+        }
+        .btn {
+            background: #dcccb8;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 60px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #4a3727;
+            margin-top: 12px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .btn:active {
+            background: #cbbca6;
+            transform: scale(0.97);
+        }
+        .result {
+            background: #fef3e8;
+            border-radius: 28px;
+            padding: 20px;
+            margin-top: 24px;
+            text-align: center;
+            border: 1px solid #eddccd;
+        }
+        .result-cat {
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+        .result-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #7c573a;
+            margin-bottom: 10px;
+        }
+        .result-desc {
+            color: #5b4635;
+            line-height: 1.55;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .result-tip {
+            background: #fff2e6;
+            border-radius: 32px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #b27d56;
+            display: inline-block;
+        }
+        .hidden {
+            display: none;
+        }
+        hr {
+            margin: 20px 0 8px;
+            border: none;
+            height: 1px;
+            background: #e9dfd1;
+        }
+        footer {
+            text-align: center;
+            font-size: 11px;
+            color: #cdbcab;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <h1>🐾 守塔猫 · 猫属MBTI</h1>
+    <div class="sub">云养猫的人间手账 · 六道题找出你的猫格</div>
+
+    <div id="questionsArea"></div>
+
+    <button class="btn" id="submitBtn">✨ 轻触塔砖 · 揭晓猫格 ✨</button>
+
+    <div id="resultArea" class="result hidden"></div>
+    <footer>暮色笼万物，猫在塔边等你 🐈</footer>
+</div>
+
+<script>
+    // 题目数据
+    const questions = [
+        { text: "傍晚，你看到云在天空跳舞，你会：", options: ["嗔怪云太矜娇，继续蹲坐", "轻抖身子，绒球似的团成一团", "用爪子轻轻拍下一瓣花", "盯着霞光发呆，直到夜色"] },
+        { text: "一只鸟在你面前唱远方的童谣，你会：", options: ["听很久，但不跟去", "试着模仿它的声音", "想起自己的"塔"，转身回去", "问它：南方冷吗"] },
+        { text: "一片花瓣落在你的鼻尖，你会：", options: ["轻轻拍下，看它钻进草丛", "顶着花瓣继续走", "把它放在塔脚边", "闻一闻，然后打个喷嚏"] },
+        { text: "你爬上一棵新绿的树，你会：", options: ["躺着睡一觉，梦蝴蝶", "看很久天空", "轻轻踩每一根树枝", "想叫云也来看"] },
+        { text: "塔的年龄你不知道，你会：", options: ["无所谓，反正它在", "偶尔用爪子量一量", "把它当旧笔，写故事", "觉得它是沉默的朋友"] },
+        { text: "暮色降临，远处有灯火和人影，你会：", options: ["浅浅呼吸，准备睡", "盯着灯火看一会儿", "缩成一团绒球", "想：云明天还会来吗"] }
+    ];
+
+    // 选项对应的性格映射（按选项顺序 A B C D）
+    const mapping = [
+        ["INFP", "ISFP", "ENFP", "INFJ"],
+        ["ISTJ", "ESFP", "ISFJ", "INFP"],
+        ["ISFP", "ENFJ", "ISTJ", "ESFP"],
+        ["INFP", "INFJ", "ISFP", "ENFP"],
+        ["ISTJ", "ISFP", "INFJ", "ENFJ"],
+        ["ISFJ", "INFP", "ISFP", "INFJ"]
+    ];
+
+    // 性格库
+    const catData = {
+        "INFP": { name: "晚照猫", emoji: "🐾🌇", desc: "浪漫敏感，爱守着自己的「塔」回忆。霞光是你一天里最后认真看的东西。", phrase: "「塔记得所有事，我也记得。」" },
+        "ISFP": { name: "绒球猫", emoji: "🐈⬛✨", desc: "灵动随性，总在探索与安睡间平衡。轻抖身子，烦恼就落下几片。", phrase: "「拍一下花瓣，世界就轻一点。」" },
+        "ENFP": { name: "花间猫", emoji: "🌸🐾", desc: "好奇、爱分享的玩伴。喜欢叫云也来看树上的风景。", phrase: "「你看！这片叶子会发光。」" },
+        "INFJ": { name: "夜灯猫", emoji: "🌙🐈", desc: "深邃的观察者，温柔地等待。暮色是塔最老的客人。", phrase: "「暮色里藏着未说出口的话。」" },
+        "ISTJ": { name: "守塔猫", emoji: "🗼🐱", desc: "可靠念旧，不声不响。塔在，猫在。", phrase: "「云卷云舒，守塔如初。」" },
+        "ISFJ": { name: "浅息猫", emoji: "🍃😴", desc: "温柔体贴，喜欢安稳。云明天来不来都没关系。", phrase: "「暮色中的浅浅呼吸，是整日的安宁。」" },
+        "ESFP": { name: "雪印猫", emoji: "❄️🐾", desc: "活泼爱玩，留下梅花印。每一天都是新的探险。", phrase: "「你看，这是我昨天踩的！」" },
+        "ENFJ": { name: "旧笔猫", emoji: "📜🐈", desc: "讲述者与联结者，用四时写故事。", phrase: "「每片叶子都有一首诗。」" }
+    };
+
+    let answers = [null, null, null, null, null, null];
+
+    function renderQuestions() {
+        const container = document.getElementById("questionsArea");
+        container.innerHTML = "";
+        questions.forEach((q, idx) => {
+            const card = document.createElement("div");
+            card.className = "question-card";
+            card.innerHTML = `
+                <div class="q-title"><span class="q-num">${idx+1}</span> ${q.text}</div>
+                <div class="options" data-qidx="${idx}">
+                    ${q.options.map((opt, optIdx) => {
+                        const letter = String.fromCharCode(65+optIdx);
+                        return `<div class="option" data-val="${optIdx}"><span class="option-letter">${letter}</span><span class="option-text">${opt}</span></div>`;
+                    }).join("")}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        document.querySelectorAll(".option").forEach(opt => {
+            opt.addEventListener("click", (e) => {
+                const parentDiv = opt.closest(".options");
+                const qIdx = parseInt(parentDiv.getAttribute("data-qidx"));
+                const val = parseInt(opt.getAttribute("data-val"));
+                parentDiv.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+                opt.classList.add("selected");
+                answers[qIdx] = val;
+            });
+        });
+    }
+
+    function computeResult() {
+        if (answers.includes(null)) {
+            alert("🐱 猫轻轻蹭你：还有几道题没选完哟～ 选完再轻触塔砖吧。");
+            return null;
+        }
+        const count = {};
+        for (let i = 0; i < answers.length; i++) {
+            const selectedIndex = answers[i];
+            const catType = mapping[i][selectedIndex];
+            count[catType] = (count[catType] || 0) + 1;
+        }
+        let maxType = null;
+        let maxVal = -1;
+        for (let [type, num] of Object.entries(count)) {
+            if (num > maxVal) { maxVal = num; maxType = type; }
+        }
+        return maxType;
+    }
+
+    function showResult() {
+        const resultType = computeResult();
+        if (!resultType) return;
+        const cat = catData[resultType];
+        if (!cat) return;
+        const resultDiv = document.getElementById("resultArea");
+        resultDiv.classList.remove("hidden");
+        resultDiv.innerHTML = `
+            <div class="result-cat">${cat.emoji}</div>
+            <div class="result-title">${resultType} · ${cat.name}</div>
+            <div class="result-desc">${cat.desc}</div>
+            <div class="result-tip">${cat.phrase}</div>
+            <hr />
+            <div style="font-size:13px; margin-top:12px;">🐾 你的守塔气质：${cat.name}，暮色亮起时，记得回塔边看看云。</div>
+        `;
+        resultDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    document.getElementById("submitBtn").addEventListener("click", showResult);
+    renderQuestions();
+</script>
+</body>
+</html>
